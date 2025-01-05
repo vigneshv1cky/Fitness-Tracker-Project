@@ -167,9 +167,9 @@ data_merged.columns = [
     "gyr_x",
     "gyr_y",
     "gyr_z",
+    "participant",
     "label",
     "category",
-    "participant",
     "set",
 ]
 data_merged.info()
@@ -203,6 +203,81 @@ data_resampled = (
 data_resampled.info()
 
 data_resampled["set'"] = data_resampled["set"].astype("int")
+
+# --------------------------------------------------------------
+# Numeric Summary
+# --------------------------------------------------------------
+
+import numpy as np
+
+
+def summarize_numeric_data(df):
+    """
+    Generate a summary for numeric columns in a DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        pd.DataFrame: A summary DataFrame containing statistics for numeric columns.
+    """
+    # Select only numeric columns
+    numeric_data = df.select_dtypes(include=[np.number])
+
+    # Function to compute summary statistics for a single column
+    def my_numeric_summary(x):
+        return pd.Series(
+            {
+                "n": len(x),
+                "unique": x.nunique(),
+                "missing": x.isna().sum(),
+                "mean": x.mean(),
+                "min": x.min(),
+                "Q1": np.percentile(x.dropna(), 25),
+                "median": x.median(),
+                "Q3": np.percentile(x.dropna(), 75),
+                "max": x.max(),
+                "sd": x.std(),
+            }
+        )
+
+    # Compute the summary for numeric columns
+    summary = (
+        numeric_data.apply(my_numeric_summary)
+        .T.reset_index()  # Transpose for better readability
+        .rename(columns={"index": "variable"})
+    )
+
+    # Add percentage columns for missing and unique values
+    summary = summary.assign(
+        missing_pct=(summary["missing"] / summary["n"]) * 100,
+        unique_pct=(summary["unique"] / summary["n"]) * 100,
+    )
+
+    # Reorganize columns for clarity
+    summary = summary[
+        [
+            "variable",
+            "n",
+            "missing",
+            "missing_pct",
+            "unique",
+            "unique_pct",
+            "mean",
+            "min",
+            "Q1",
+            "median",
+            "Q3",
+            "max",
+            "sd",
+        ]
+    ]
+
+    return summary
+
+
+summarize_numeric_data(data_resampled)
+data_resampled.describe()
 
 
 # --------------------------------------------------------------
