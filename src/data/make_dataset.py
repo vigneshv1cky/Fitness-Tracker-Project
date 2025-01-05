@@ -159,7 +159,20 @@ accelerometer_data, gyroscope_data = read_data_from_files(data_path)
 # Merging datasets
 # --------------------------------------------------------------
 
-
+data_merged = pd.concat([accelerometer_data.iloc[:, :3], gyroscope_data], axis=1)
+data_merged.columns = [
+    "acc_x",
+    "acc_y",
+    "acc_z",
+    "gyr_x",
+    "gyr_y",
+    "gyr_z",
+    "label",
+    "category",
+    "participant",
+    "set",
+]
+data_merged.info()
 # --------------------------------------------------------------
 # Resample data (frequency conversion)
 # --------------------------------------------------------------
@@ -167,6 +180,29 @@ accelerometer_data, gyroscope_data = read_data_from_files(data_path)
 # Accelerometer:    12.500HZ
 # Gyroscope:        25.000Hz
 
+sampling = {
+    "gyr_x": "mean",
+    "acc_x": "mean",
+    "acc_y": "mean",
+    "acc_z": "mean",
+    "gyr_y": "mean",
+    "gyr_z": "mean",
+    "label": "last",
+    "category": "last",
+    "participant": "last",
+    "set": "last",
+}
+
+data_merged.resample(rule="200ms").apply(sampling)
+
+data_resampled = (
+    data_merged.groupby(pd.Grouper(freq="D"))
+    .apply(lambda df: df.resample("200ms").apply(sampling).dropna())
+    .reset_index(level=0, drop=True)
+)
+data_resampled.info()
+
+data_resampled["set'"] = data_resampled["set"].astype("int")
 
 # --------------------------------------------------------------
 # Export dataset
