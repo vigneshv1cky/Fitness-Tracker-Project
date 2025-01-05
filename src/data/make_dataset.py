@@ -74,10 +74,85 @@ for f in files:
 # Working with datetimes
 # --------------------------------------------------------------
 
+acc_df.info()
+
+pd.to_datetime(df["epoch (ms)"], unit="ms")
+
+acc_df.index = pd.to_datetime(acc_df["epoch (ms)"], unit="ms")
+gyr_df.index = pd.to_datetime(gyr_df["epoch (ms)"], unit="ms")
+
+acc_df = acc_df.drop(columns=["epoch (ms)", "time (01:00)", "elapsed (s)"])
+gyr_df = gyr_df.drop(columns=["epoch (ms)", "time (01:00)", "elapsed (s)"])
 
 # --------------------------------------------------------------
 # Turn into function
 # --------------------------------------------------------------
+
+
+def read_data_from_files(data_path):
+    """
+    Process all MetaMotion CSV files from a given directory.
+
+    Parameters:
+        data_path (str): The directory path where the CSV files are stored.
+
+    Returns:
+        tuple: A tuple containing two DataFrames, one for Accelerometer data and one for Gyroscope data.
+    """
+
+    # List all CSV files in the specified directory
+    files = glob(os.path.join(data_path, "*.csv"))
+
+    # Initialize DataFrames for Accelerometer and Gyroscope data
+    acc_df = pd.DataFrame()
+    gyr_df = pd.DataFrame()
+
+    # Set counters for data grouping
+    acc_set = 1
+    gyr_set = 1
+
+    # Process each file
+    for f in files:
+        # Extract metadata from the filename
+        participant = f.split("-")[0].replace(data_path, "")
+        label = f.split("-")[1]
+        category = f.split("-")[2].rstrip("123").rstrip("_MetaWear_2019")
+
+        # Read the file into a DataFrame
+        df = pd.read_csv(f)
+        df["participant"] = participant
+        df["label"] = label
+        df["category"] = category
+
+        # Determine the type of data (Accelerometer or Gyroscope) and append to respective DataFrame
+        if "Accelerometer" in f:
+            df["set"] = acc_set
+            acc_set += 1
+            acc_df = pd.concat([acc_df, df], ignore_index=True)
+
+        if "Gyroscope" in f:
+            df["set"] = gyr_set
+            gyr_set += 1
+            gyr_df = pd.concat([gyr_df, df], ignore_index=True)
+
+    # Convert epoch timestamps to datetime and set as index
+    acc_df.index = pd.to_datetime(acc_df["epoch (ms)"], unit="ms")
+    gyr_df.index = pd.to_datetime(gyr_df["epoch (ms)"], unit="ms")
+
+    # Drop unnecessary columns
+    acc_df = acc_df.drop(
+        columns=["epoch (ms)", "time (01:00)", "elapsed (s)"], errors="ignore"
+    )
+    gyr_df = gyr_df.drop(
+        columns=["epoch (ms)", "time (01:00)", "elapsed (s)"], errors="ignore"
+    )
+
+    return acc_df, gyr_df
+
+
+# Example usage:
+data_path = "../../data/raw/MetaMotion/"
+accelerometer_data, gyroscope_data = read_data_from_files(data_path)
 
 
 # --------------------------------------------------------------
