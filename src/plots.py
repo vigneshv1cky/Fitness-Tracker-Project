@@ -130,7 +130,9 @@ for label in labels:
 
         if len(all_axis_df) > 0:
             fig, ax = plt.subplots(nrows=2, sharex=True, figsize=(20, 10))
-            all_axis_df[["acc_x", "acc_y", "acc_z"]].plot(ax=ax[0])
+            all_axis_df[["acc_x", "acc_y", "acc_z"]].plot(
+                ax=ax[0]
+            )  # Accelerometer data
             all_axis_df[["gyr_x", "gyr_y", "gyr_z"]].plot(ax=ax[1])  # Gyroscope data
             ax[0].legend(
                 loc="upper center", bbox_to_anchor=(0.9, 1.1), ncol=3, fancybox=True
