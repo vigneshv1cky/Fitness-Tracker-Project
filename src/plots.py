@@ -144,4 +144,5 @@ for label in labels:
             ax[0].set_ylabel("Acceleration")
             ax[1].set_ylabel("Gyroscope")
             ax[0].set_title(f"Label={label}, Participant={participant}")
+            plt.savefig(f"../reports/figures/{label}_for_{participant}.png")
             plt.show()
