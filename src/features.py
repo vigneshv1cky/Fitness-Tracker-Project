@@ -276,7 +276,7 @@ for col in outlier_columns:
 
 
 outlier_removed_df.info()
-
+outlier_removed_df.isna().sum()
 
 # -----------------------------------------------------------
 # Export the dataframe
