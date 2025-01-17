@@ -1,9 +1,10 @@
 library(tidyverse)
+library(lubridate)
 
 # --------------------------------------------------------------
 # Read single CSV file
 # --------------------------------------------------------------
-single_file_arc <- read_csv("data/raw/MetaMotion/A-bench-heavy_MetaWear_2019-01-14T14.22.49.165_C42732BE255C_Accelerometer_12.500Hz_1.4.4.csv")
+single_file_arc <- read_csv("data/raw/MetaMotion/A-bench-heavy2-rpe8_MetaWear_2019-01-11T16.10.08.270_C42732BE255C_Accelerometer_12.500Hz_1.4.4.csv")
 
 single_file_gyr <- read_csv("data/raw/MetaMotion/A-bench-heavy2-rpe8_MetaWear_2019-01-11T16.10.08.270_C42732BE255C_Gyroscope_25.000Hz_1.4.4.csv")
 
@@ -40,7 +41,6 @@ df <- read_csv(f) %>%
   mutate(participant = participant, 
          label = label, 
          category = category)
-
 
 
 # --------------------------------------------------------------
@@ -87,3 +87,17 @@ for (f in files) {
   }
 }
 
+# --------------------------------------------------------------
+# Working with datetimes
+# --------------------------------------------------------------
+
+# Convert epoch (ms) to datetime and set as index
+acc_df <- acc_df %>% 
+  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>% 
+  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>% 
+  relocate(datetime)
+
+gyr_df <- gyr_df %>% 
+  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>% 
+  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>% 
+  relocate(datetime)
