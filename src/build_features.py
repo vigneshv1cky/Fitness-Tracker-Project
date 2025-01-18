@@ -8,7 +8,6 @@ from sklearn.cluster import KMeans
 
 # Set global plot style and parameters
 plt.style.use("ggplot")
-plt.style.use("default")
 plt.rcParams["figure.figsize"] = [20, 10]  # Set figure size
 plt.rcParams["figure.dpi"] = 100  # Set figure resolution
 
@@ -173,7 +172,7 @@ for s in df_freq["set"].unique():
     subset = FreqAbs.abstract_frequency(subset, predictor_columns, ws, fs)
     df_freq_list.append(subset)
 
-df_freq = pd.concat(df_freq_list)
+df_freq = pd.concat(df_freq_list).set_index("epoch (ms)", drop=True)
 df_freq.info()
 
 
@@ -181,7 +180,8 @@ df_freq.info()
 # Dealing with overlapping windows
 # --------------------------------------------------------------
 
-df_freq.dropna()
+df_freq = df_freq.dropna()
+df_freq.isna().sum()
 df_freq = df_freq.iloc[::2]
 
 # --------------------------------------------------------------
@@ -234,6 +234,7 @@ ax.set_zlabel("Z-Axis")
 plt.legend()
 plt.show()
 
+df_cluster.isna().sum()
 
 # --------------------------------------------------------------
 # Export dataset
