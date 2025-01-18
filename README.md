@@ -13,7 +13,7 @@ This repository provides all the code to process, visualize, and classify accele
 * Detect improper form 
 
 #### Installation
-Create and activate an anaconda environment and install all package versions using `conda install --name <EnvironmentName> --file conda_requirements.txt`. Install non-conda packages using pip: `pip install -r pip_requirements.txt`.
+Create and activate an anaconda environment and install all package versions using `conda install --name <EnvironmentName> --file conda_requirements.txt`. Install non-conda packages using pip: `pip install -r requirements.txt`.
 
 #### References
 The original code is associated with the book titled "Machine Learning for the Quantified Self"
