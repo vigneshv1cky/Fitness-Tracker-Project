@@ -22,25 +22,27 @@ files <- list.files(path = "data/raw/MetaMotion", pattern = "*.csv", full.names 
 data_path <- "data/raw/MetaMotion/"
 f <- files[1]
 
-participant <- f %>% 
-  str_replace(data_path, "") %>% 
-  str_split("-") %>% 
+participant <- f %>%
+  str_replace(data_path, "") %>%
+  str_split("-") %>%
   pluck(1, 1)
 
-label <- f %>% 
-  str_split("-") %>% 
+label <- f %>%
+  str_split("-") %>%
   pluck(1, 2)
 
-category <- f %>% 
-  str_split("-") %>% 
-  pluck(1, 3) %>% 
-  str_remove("123") %>% 
+category <- f %>%
+  str_split("-") %>%
+  pluck(1, 3) %>%
+  str_remove("123") %>%
   str_remove("_MetaWear_2019")
 
 df <- read_csv(f) %>%
-  mutate(participant = participant, 
-         label = label, 
-         category = category)
+  mutate(
+    participant = participant,
+    label = label,
+    category = category
+  )
 
 
 # --------------------------------------------------------------
@@ -54,25 +56,27 @@ acc_set <- 1
 gyr_set <- 1
 
 for (f in files) {
-  participant <- f %>% 
-    str_replace(data_path, "") %>% 
-    str_split("-") %>% 
+  participant <- f %>%
+    str_replace(data_path, "") %>%
+    str_split("-") %>%
     pluck(1, 1)
 
-  label <- f %>% 
-    str_split("-") %>% 
+  label <- f %>%
+    str_split("-") %>%
     pluck(1, 2)
 
-  category <- f %>% 
-    str_split("-") %>% 
-    pluck(1, 3) %>% 
-    str_remove("123") %>% 
+  category <- f %>%
+    str_split("-") %>%
+    pluck(1, 3) %>%
+    str_remove("123") %>%
     str_remove("_MetaWear_2019")
 
   df <- read_csv(f) %>%
-    mutate(participant = participant, 
-           label = label, 
-           category = category)
+    mutate(
+      participant = participant,
+      label = label,
+      category = category
+    )
 
   if (str_detect(f, "Accelerometer")) {
     df <- df %>% mutate(set = acc_set)
@@ -92,12 +96,12 @@ for (f in files) {
 # --------------------------------------------------------------
 
 # Convert epoch (ms) to datetime and set as index
-acc_df <- acc_df %>% 
-  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>% 
-  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>% 
+acc_df <- acc_df %>%
+  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>%
+  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>%
   relocate(datetime)
 
-gyr_df <- gyr_df %>% 
-  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>% 
-  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>% 
+gyr_df <- gyr_df %>%
+  mutate(datetime = as_datetime(`epoch (ms)` / 1000)) %>%
+  select(-`epoch (ms)`, -`time (01:00)`, -`elapsed (s)`) %>%
   relocate(datetime)
